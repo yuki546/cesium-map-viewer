@@ -8,6 +8,8 @@ export default function CesiumViewer() {
   const viewerRef = useRef<CesiumComponentRef<CesiumViewerType> | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
 
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   const handleViewerRef = useCallback(
     (ref: CesiumComponentRef<CesiumViewerType> | null) => {
       viewerRef.current = ref;
@@ -18,7 +20,22 @@ export default function CesiumViewer() {
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-slate-900 text-slate-900">
-      <ResiumViewer ref={handleViewerRef} className="h-full w-full" />;
+      <ResiumViewer ref={handleViewerRef} className="h-full w-full" />
+      <div className="pointer-events-none absolute inset-0 z-20 flex">
+        <div
+          className={`pointer-events-auto relative flex h-full w-80 flex-col border-r-5 border-sky-500 bg-white/95 shadow-xl backdrop-blur transition-trarnsform duration-300 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%-3.5rem)]"
+          }`}
+        >
+          <button
+            type="button"
+            onClick={() => setSidebarOpen((prev) => !prev)}
+            className="absolute -right-5 top-6 flex h-10 w-10 items-center justify-center rounded-r-lg bg-white/95 text-slate-700 shadow-lg transition hover:bg-white"
+          >
+            <span className="text-lg">{sidebarOpen ? "⟨" : "⟩"}</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

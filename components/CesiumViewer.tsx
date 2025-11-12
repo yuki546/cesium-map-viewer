@@ -24,13 +24,13 @@ export default function CesiumViewer() {
       <div className="pointer-events-none absolute inset-0 z-20 flex">
         <div
           className={`pointer-events-auto relative flex h-full w-80 flex-col border-r-5 border-sky-500 bg-white/95 shadow-xl backdrop-blur transition-trarnsform duration-300 ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%-3.5rem)]"
+            sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%)]"
           }`}
         >
           <button
             type="button"
             onClick={() => setSidebarOpen((prev) => !prev)}
-            className="absolute -right-5 top-6 flex h-10 w-10 items-center justify-center rounded-r-lg bg-white/95 text-slate-700 shadow-lg transition hover:bg-white"
+            className="absolute -right-11.25 top-6 flex h-10 w-10 items-center justify-center rounded-r-lg bg-white/95 text-slate-700 shadow-lg transition hover:bg-white"
           >
             <span className="text-lg">{sidebarOpen ? "⟨" : "⟩"}</span>
           </button>

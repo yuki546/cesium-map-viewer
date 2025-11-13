@@ -4,11 +4,20 @@ import { useCallback, useRef, useState } from "react";
 import { Viewer as ResiumViewer } from "resium";
 import type { CesiumComponentRef } from "resium";
 
+const SIDEBAR_TABS = [
+  { id: "camera" as const, label: "カメラ" },
+  { id: "layers" as const, label: "レイヤー" },
+  { id: "search" as const, label: "検索" },
+];
+
+type ViewerTab = (typeof SIDEBAR_TABS)[number]["id"];
+
 export default function CesiumViewer() {
   const viewerRef = useRef<CesiumComponentRef<CesiumViewerType> | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<ViewerTab>("camera");
 
   const handleViewerRef = useCallback(
     (ref: CesiumComponentRef<CesiumViewerType> | null) => {
@@ -34,6 +43,30 @@ export default function CesiumViewer() {
           >
             <span className="text-lg">{sidebarOpen ? "⟨" : "⟩"}</span>
           </button>
+
+          <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-4">
+            <div className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+              Cesium
+            </div>
+            <div className="text-sm text-slate-400">Map Viewer</div>
+          </div>
+
+          <div className="flex border-b border-slate-200 px-4">
+            {SIDEBAR_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 border-b-2 px-2 py-3 text-sm font-medium transition ${
+                  activeTab === tab.id
+                    ? "border-sky-500 text-slate-900"
+                    : "border-transparent text-slate-400 hover:border-slate-200 hover:text-slate-600"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

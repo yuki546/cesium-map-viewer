@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# map-viewer
 
-## Getting Started
+Next.js と Cesium を組み合わせた 3D マップビューワーです。カメラ操作・レイヤー切り替え・地名検索をサイドバーから切り替えられ、東京を初期地点として世界各地へ飛行できます。
 
-First, run the development server:
+## 主な機能
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- 📍 **カメラ制御** — 経度・緯度・高度・姿勢を直接入力して任意地点へ移動。現在視点の値取得や初期位置へのリセットもワンクリックで行えます。
+- 🗺️ **レイヤー管理** — Cesium Ion の 3D 建物タイルと地形タイルをオンデマンドで読み込み。不要時には破棄してメモリを解放します。
+- 🔎 **地名検索** — OpenStreetMap Nominatim API で候補を取得し、検索結果をクリックすると自動で該当地域へフライします。
+- 🧭 **日本語 UI** — 操作メッセージやバリデーションエラーを日本語で表示し、直感的に扱えるようにしています。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 技術スタック
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- [Next.js 16](https://nextjs.org/)
+- [React 19](https://react.dev/)
+- [CesiumJS](https://cesium.com/platform/cesiumjs/) + [Resium](https://resium.reearth.io/)
+- [Tailwind CSS 4 (preview)](https://tailwindcss.com/blog/tailwindcss-v4-alpha)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## セットアップ
 
-## Learn More
+1. 依存関係をインストールします。
+   ```bash
+   npm install
+   ```
+2. Cesium の静的アセットを `public/cesium` にコピーします。
+   ```bash
+   npm run copy-cesium
+   ```
+3. Cesium Ion のアクセストークンと（必要に応じて）アセット ID を `.env.local` に設定します。
+   ```bash
+   NEXT_PUBLIC_CESIUM_ION_TOKEN=<your-ion-token>
+   # オプション: デフォルト 3D 建物 (96188) / 地形 (75343) のアセット ID を上書き
+   NEXT_PUBLIC_ION_ASSET_ID_BUILDINGS=<ion-asset-id>
+   NEXT_PUBLIC_ION_ASSET_ID_TERRAIN=<ion-asset-id>
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+## 開発用スクリプト
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| コマンド              | 説明                                                                                                                                                  |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`         | 開発サーバーを `http://localhost:3000` で起動します。                                                                                                 |
+| `npm run build`       | 本番ビルドを生成します。ビルド前に `prebuild` により `npm run copy-cesium` が自動実行され、Cesium の静的アセットが `public/cesium` にコピーされます。 |
+| `npm run start`       | 本番ビルドをローカルで実行します。                                                                                                                    |
+| `npm run lint`        | ESLint で静的解析を実行します。                                                                                                                       |
+| `npm run copy-cesium` | Cesium の静的アセットを `public/cesium` にコピーします（通常は `npm run build` 実行時に自動で実行されますが、手動で実行することもできます）。         |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 使い方のヒント
 
-## Deploy on Vercel
+- サイドバー左上のタブで「カメラ」「レイヤー」「検索」を切り替えられます。サイドバー自体も折りたたみ可能です。
+- 建物・地形レイヤーは読み込みに数秒かかることがあります。ローディングインジケーターとエラーメッセージで状態を確認できます。
+- 検索は Nominatim 公開 API を利用しているため、必要に応じてレートリミット対策や独自インスタンスの利用を検討してください。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ライセンスとクレジット
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Cesium Ion アセットを使用する際は、Cesium の[利用規約](https://www.cesium.com/platform/cesium-ion/terms/)に従ってください。
+- OpenStreetMap データは [OpenStreetMap Contributors](https://www.openstreetmap.org/copyright) によって提供されています。
+
+## プロジェクト構成
+
+- `app/` — Next.js App Router エントリーポイント。
+- `components/` — Cesium ビューアーやヘッダーなどの UI コンポーネント。
+- `public/cesium/` — `npm run copy-cesium` で配置する Cesium の静的ファイル。
+- `scripts/` — Cesium アセットをコピーするユーティリティスクリプト。
+
+開発やカスタマイズの際は Issue や Pull Request でお気軽にご相談ください。

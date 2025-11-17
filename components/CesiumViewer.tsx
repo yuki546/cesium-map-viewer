@@ -80,6 +80,27 @@ type CameraDestination = {
 
 type ParsedCameraState = CameraDestination & CameraOrientation;
 
+type CameraBookmark = {
+  id: string;
+  state: CameraFormState;
+  savedAt: string;
+};
+
+const TOKYO_TIMESTAMP_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
+
+function formatTokyoTimestamp(date: Date): string {
+  return TOKYO_TIMESTAMP_FORMATTER.format(date);
+}
+
 type SearchResult = {
   id: string;
   displayName: string;
@@ -185,6 +206,7 @@ export default function CesiumViewer() {
     ...DEFAULT_CAMERA_STATE,
   }));
 
+  const [cameraBookmarks, setCameraBookmarks] = useState<CameraBookmark[]>([]);
   const [gotoError, setGotoError] = useState("");
 
   const [buildingEnabled, setBuildingEnabled] = useState(false);
@@ -278,6 +300,24 @@ export default function CesiumViewer() {
     },
     [cameraForm, flyTo]
   );
+
+  const handleSaveCameraBookmark = useCallback(() => {
+    setCameraBookmarks((previous) => {
+      const bookmark = {
+        id: `${Date.now().toString(36)}-${Math.random()
+          .toString(36)
+          .slice(2, 8)}`,
+        state: { ...cameraForm },
+        savedAt: formatTokyoTimestamp(new Date()),
+      };
+
+      return [bookmark, ...previous].slice(0, 3);
+    });
+  }, [cameraForm]);
+
+  const handleLoadCameraBookmark = useCallback((bookmark: CameraBookmark) => {
+    setCameraForm({ ...bookmark.state });
+  }, []);
 
   const handleGoHome = useCallback(() => {
     setCameraForm({ ...DEFAULT_CAMERA_STATE });
@@ -770,7 +810,45 @@ export default function CesiumViewer() {
                   >
                     現在の視点を読み込み
                   </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveCameraBookmark}
+                    className="col-span-2 rounded-md border border-dashed border-slate-300 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-500 hover:text-sky-600"
+                  >
+                    一時保存
+                  </button>
                 </div>
+
+                {cameraBookmarks.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-xs font-semibold text-slate-500">
+                      一時保存した視点
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {cameraBookmarks.map((bookmark) => (
+                        <button
+                          key={bookmark.id}
+                          type="button"
+                          onClick={() => handleLoadCameraBookmark(bookmark)}
+                          className="flex flex-col rounded-md border border-slate-200 px-3 py-2 text-left text-xs text-slate-600 transition hover:border-sky-300 hover:text-slate-900"
+                        >
+                          <span className="text-[0.65rem] text-slate-400">
+                            保存時刻: {bookmark.savedAt}（JST）
+                          </span>
+                          <span className="text-sm font-semibold text-slate-700">
+                            Lon {bookmark.state.lon}, Lat {bookmark.state.lat}
+                          </span>
+                          <span>
+                            Height {bookmark.state.height}m ・ Heading{" "}
+                            {bookmark.state.heading}° ・ Pitch{" "}
+                            {bookmark.state.pitch}° ・ Roll{" "}
+                            {bookmark.state.roll}°
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </form>
             )}
 

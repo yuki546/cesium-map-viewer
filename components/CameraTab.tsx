@@ -9,7 +9,7 @@ export type CameraFormState = {
   roll: string;
 };
 
-type CameraBookmark = {
+export type CameraBookmark = {
   id: string;
   state: CameraFormState;
   savedAt: string;

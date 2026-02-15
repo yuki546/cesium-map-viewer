@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Node.js のセットアップ（npm のキャッシュを使用）
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # 依存関係のインストール（npm ci は CI環境用のクリーンインストールコマンドです）
+      - name: Install dependencies
+        run: npm ci
+
+      # Lintチェック（package.json に lint コマンドがある前提）
+      - name: Run Lint
+        run: npm run lint
+
+      # ビルドチェック（型チェックも含む）
+      - name: Run build
+        env:
+          NEXT_PUBLIC_CESIUM_ION_TOKEN: ${{ secrets.NEXT_PUBLIC_CESIUM_ION_TOKEN }}
+          NEXT_PUBLIC_ION_ASSET_ID_BUILDINGS: ${{ secrets.NEXT_PUBLIC_ION_ASSET_ID_BUILDINGS }}
+          NEXT_PUBLIC_ION_ASSET_ID_TERRAIN: ${{ secrets.NEXT_PUBLIC_ION_ASSET_ID_TERRAIN }}
+        run: npm run build

@@ -1,3 +1,5 @@
+![CI](https://github.com/yuki546/cesium-map-viewer/actions/workflows/ci.yml/badge.svg)
+
 # cesium-map-viewer
 
 Next.js と Cesium を組み合わせた 3D マップビューワーです。カメラ操作・レイヤー切り替え・地名検索をサイドバーから切り替えられ、東京を初期地点として世界各地へ飛行できます。
